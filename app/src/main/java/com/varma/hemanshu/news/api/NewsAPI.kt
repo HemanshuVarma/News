@@ -1,6 +1,6 @@
 package com.varma.hemanshu.news.api
 
-import com.varma.hemanshu.news.NewsResponse
+import com.varma.hemanshu.news.models.NewsResponse
 import com.varma.hemanshu.news.util.Constants.Companion.API_KEY
 import retrofit2.Response
 import retrofit2.http.GET
