@@ -13,12 +13,20 @@ import retrofit2.Response
 
 class NewsViewModel(val newsRepository: NewsRepository) : ViewModel() {
 
+    //Data holder for Breaking News
     private val _breakingNews = MutableLiveData<Resource<NewsResponse>>()
 
     // backing variable for breaking news
     val breakingNews: LiveData<Resource<NewsResponse>> get() = _breakingNews
 
-    var breakingNewsPage = 1
+    //Data holder for search news
+    private val _searchNews = MutableLiveData<Resource<NewsResponse>>()
+
+    // backing variable for search news
+    val searchNews: LiveData<Resource<NewsResponse>> get() = _searchNews
+
+    private var breakingNewsPage = 1
+    private var searchNewsPage = 1
 
     init {
         getBreakingNews(COUNTRY_CODE)
@@ -30,6 +38,12 @@ class NewsViewModel(val newsRepository: NewsRepository) : ViewModel() {
         _breakingNews.postValue(handleBreakingNewsResponse(response))
     }
 
+    fun searchNews(searchQuery: String) = viewModelScope.launch {
+        _searchNews.postValue(Resource.Loading())
+        val response = newsRepository.searchNews(searchQuery, searchNewsPage)
+        _searchNews.postValue(handleSearchNewsResponse(response))
+    }
+
     private fun handleBreakingNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
@@ -38,4 +52,15 @@ class NewsViewModel(val newsRepository: NewsRepository) : ViewModel() {
         }
         return Resource.Error(response.message())
     }
+
+    // Will be supporting pagination soon
+    private fun handleSearchNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Resource.Success(data = resultResponse)
+            }
+        }
+        return Resource.Error(response.message())
+    }
+
 }

@@ -8,5 +8,7 @@ class Constants {
 
         // See https://newsapi.org/docs/endpoints/top-headlines for country codes
         const val COUNTRY_CODE = "us"
+
+        const val SEARCH_NEWS_DELAY = 500L
     }
 }
