@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.varma.hemanshu.news.R
 import com.varma.hemanshu.news.adapters.NewsAdapter
@@ -23,6 +24,15 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         viewModel = (activity as NewsActivity).viewModel
 
         setupRecyclerView()
+
+        newsAdapter.setOnItemClickListener { article ->
+            val action =
+                BreakingNewsFragmentDirections.actionBreakingNewsFragmentToArticleFragment(article)
+            findNavController().navigate(
+                action
+            )
+        }
+
         viewModel.breakingNews.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {

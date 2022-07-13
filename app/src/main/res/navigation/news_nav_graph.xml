@@ -19,7 +19,11 @@
     <fragment
         android:id="@+id/articleFragment"
         android:name="com.varma.hemanshu.news.ui.fragments.ArticleFragment"
-        android:label="@string/article" />
+        android:label="@string/article">
+        <argument
+            android:name="article"
+            app:argType="com.varma.hemanshu.news.models.Article" />
+    </fragment>
     <fragment
         android:id="@+id/searchNewsFragment"
         android:name="com.varma.hemanshu.news.ui.fragments.SearchNewsFragment"
