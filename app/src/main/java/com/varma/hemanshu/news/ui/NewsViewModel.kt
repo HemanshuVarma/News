@@ -20,20 +20,26 @@ class NewsViewModel(val newsRepository: NewsRepository) : ViewModel() {
     // backing variable for breaking news
     val breakingNews: LiveData<Resource<NewsResponse>> get() = _breakingNews
 
+    // Caching all the responses when using pagination for breaking news
+    var breakingNewsResponse: NewsResponse? = null
+
     //Data holder for search news
     private val _searchNews = MutableLiveData<Resource<NewsResponse>>()
 
     // backing variable for search news
     val searchNews: LiveData<Resource<NewsResponse>> get() = _searchNews
 
-    private var breakingNewsPage = 1
-    private var searchNewsPage = 1
+    // Caching all the responses when using pagination for search news
+    var searchNewsResponse: NewsResponse? = null
+
+    var breakingNewsPage = 1
+    var searchNewsPage = 1
 
     init {
         getBreakingNews(COUNTRY_CODE)
     }
 
-    private fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+    fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         _breakingNews.postValue(Resource.Loading())
         val response = newsRepository.getBreakingNews(countryCode, breakingNewsPage)
         _breakingNews.postValue(handleBreakingNewsResponse(response))
@@ -48,17 +54,34 @@ class NewsViewModel(val newsRepository: NewsRepository) : ViewModel() {
     private fun handleBreakingNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
-                return Resource.Success(data = resultResponse)
+                // incrementing page counter for pagination
+                breakingNewsPage++
+                if (breakingNewsResponse == null) {
+                    breakingNewsResponse = resultResponse
+                } else {
+                    val oldArticles = breakingNewsResponse?.articles
+                    val newArticles = resultResponse.articles
+                    oldArticles?.addAll(newArticles)
+                }
+                return Resource.Success(data = breakingNewsResponse ?: resultResponse)
             }
         }
         return Resource.Error(response.message())
     }
 
-    // Will be supporting pagination soon
     private fun handleSearchNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
-                return Resource.Success(data = resultResponse)
+                // incrementing page counter for pagination
+                searchNewsPage++
+                if (searchNewsResponse == null) {
+                    searchNewsResponse = resultResponse
+                } else {
+                    val oldArticles = searchNewsResponse?.articles
+                    val newArticles = resultResponse.articles
+                    oldArticles?.addAll(newArticles)
+                }
+                return Resource.Success(data = searchNewsResponse ?: resultResponse)
             }
         }
         return Resource.Error(response.message())
