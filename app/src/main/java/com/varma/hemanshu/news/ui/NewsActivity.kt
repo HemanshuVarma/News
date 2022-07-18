@@ -18,7 +18,7 @@ class NewsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val newsRepository = NewsRepository(ArticleDatabase.invoke(this))
-        val viewModelProviderFactory = NewsViewModelProviderFactory(newsRepository)
+        val viewModelProviderFactory = NewsViewModelProviderFactory(application, newsRepository)
         viewModel = ViewModelProvider(this, viewModelProviderFactory)[NewsViewModel::class.java]
 
         //Inflating UI after viewModel is initialized/ready
